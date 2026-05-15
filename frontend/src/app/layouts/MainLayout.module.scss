@@ -1,0 +1,60 @@
+.layout {
+  height: 100vh;
+  overflow: hidden; // Запрещаем общий скролл окна
+  background: var(--color-bg);
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+  height: 80px;
+  padding: 0 !important;
+  background: rgba(255, 255, 255, 0.75) !important;
+  backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--color-border);
+  display: flex;
+  align-items: center;
+}
+
+.headerInner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.logo {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: var(--color-text);
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+
+  a {
+    color: var(--color-text-secondary);
+    font-size: 15px;
+    font-weight: 500;
+    transition: var(--transition);
+    text-decoration: none;
+
+    &:hover {
+      color: var(--color-text);
+    }
+  }
+}
+
+.content {
+  flex: 1;
+  height: 100%;
+  overflow: hidden; // Важно: контент не должен иметь свой скроллбар
+}

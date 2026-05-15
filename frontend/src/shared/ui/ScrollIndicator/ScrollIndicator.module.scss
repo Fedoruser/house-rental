@@ -1,0 +1,64 @@
+.wrapper {
+  position: fixed;
+  right: 32px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 1001; // Выше хедера
+
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  border-radius: 40px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.dotContainer {
+  position: relative;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &:hover {
+    .label {
+      opacity: 1;
+      transform: translateX(-120%);
+    }
+  }
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.label {
+  position: absolute;
+  right: 0;
+  white-space: nowrap;
+  background: var(--color-black);
+  color: white;
+  padding: 4px 12px;
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  font-weight: 500;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateX(-100%);
+  transition: all 0.3s ease;
+
+  &::after {
+    content: '';
+    position: absolute;
+    right: -4px;
+    top: 50%;
+    transform: translateY(-50%);
+    border-left: 4px solid var(--color-black);
+    border-top: 4px solid transparent;
+    border-bottom: 4px solid transparent;
+  }
+}

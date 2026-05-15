@@ -1,0 +1,25 @@
+.section {
+  width: 100%;
+  position: relative;
+
+  display: flex;
+
+  /* важно */
+  min-height: 100vh;
+}
+
+/* только для fullscreen секций */
+.fullscreen {
+  align-items: center;
+}
+
+/* snap отдельно */
+.snap {
+  scroll-snap-align: start;
+}
+
+/* контент */
+.contentWrapper {
+  width: 100%;
+  will-change: transform, opacity, filter;
+}

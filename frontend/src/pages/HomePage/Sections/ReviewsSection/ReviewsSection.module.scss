@@ -1,0 +1,205 @@
+.section {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  padding: 140px 0;
+  background: #fafafa;
+  overflow: hidden;
+}
+
+.wrapper {
+  max-width: 1100px; // Чуть расширил для баланса с кнопками
+  margin: 0 auto;
+  text-align: center;
+  width: 100%;
+}
+
+.header {
+  margin-bottom: 60px;
+
+  .label {
+    display: block;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-size: 13px;
+    font-weight: 700;
+    margin-bottom: 12px;
+    color: #999;
+  }
+
+  h2 {
+    font-size: clamp(32px, 5vw, 56px);
+    font-weight: 800;
+    letter-spacing: -2px;
+    color: #111;
+  }
+}
+
+.sliderContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 40px;
+  position: relative;
+
+  @media (max-width: 768px) {
+    gap: 0;
+  }
+}
+
+.navBtn {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #000;
+  color: #fff;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  flex-shrink: 0; // Чтобы кнопку не сплющило
+
+  &:hover {
+    transform: scale(1.1);
+    background: #222;
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+
+  @media (max-width: 768px) {
+    display: none;
+  }
+}
+
+.slider {
+  flex-grow: 1;
+  max-width: 800px; // Ограничил ширину карточки для читаемости
+}
+
+.card {
+  background: white;
+  padding: 60px;
+  border-radius: 48px;
+  border: 1px solid rgba(0, 0, 0, 0.03);
+  box-shadow: 0 40px 80px -20px rgba(0, 0, 0, 0.08);
+  position: relative;
+  text-align: left;
+  min-height: 380px; // Чтобы карточка не прыгала по высоте при разном тексте
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  @media (max-width: 768px) {
+    padding: 40px 24px;
+    border-radius: 32px;
+    min-height: auto;
+  }
+}
+
+.quoteMark {
+  font-size: 120px;
+  position: absolute;
+  top: 10px;
+  left: 30px;
+  color: #f8f8f8;
+  font-family: serif;
+  line-height: 1;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.cardHeader {
+  margin-bottom: 20px;
+  position: relative;
+  z-index: 1;
+}
+
+.stars {
+  display: flex;
+  gap: 4px;
+}
+
+.text {
+  font-size: clamp(18px, 2.5vw, 26px);
+  line-height: 1.45;
+  font-weight: 500;
+  color: #1a1a1a;
+  margin-bottom: 40px;
+  position: relative;
+  z-index: 1;
+  letter-spacing: -0.5px;
+}
+
+.footer {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  position: relative;
+  z-index: 1;
+}
+
+.avatar {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #111 0%, #444 100%);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 18px;
+}
+
+.info {
+  display: flex;
+  flex-direction: column;
+}
+
+.name {
+  font-weight: 700;
+  font-size: 17px;
+  color: #111;
+}
+
+.role {
+  font-size: 14px;
+  color: #888;
+}
+
+.dots {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 50px;
+}
+
+.dot {
+  width: 48px;
+  height: 6px;
+  background: #e5e5e5;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  position: relative;
+  padding: 0;
+
+  &.active {
+    background: #e5e5e5;
+  }
+}
+
+.activeLine {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 100%;
+  background: #000;
+  border-radius: 10px;
+}

@@ -1,0 +1,30 @@
+:root {
+  // colors
+  --color-white: #ffffff;
+  --color-black: #111111;
+
+  --color-primary: #c59d5f;
+  --color-primary-hover: #b38b4d;
+
+  --color-bg: #f8f8f8;
+  --color-text: #222222;
+  --color-text-secondary: #666666;
+
+  --color-border: #e5e5e5;
+
+  // container
+  --container-width: 1440px;
+  --container-padding: 20px;
+
+  // radius
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 24px;
+
+  // shadows
+  --shadow-sm: 0 2px 10px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 6px 24px rgba(0, 0, 0, 0.08);
+
+  // transition
+  --transition: 0.2s ease-in-out;
+}
