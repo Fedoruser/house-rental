@@ -27,7 +27,7 @@ export type HouseCategory =
 export interface House {
   id: number
   title: string
-  category: Exclude<HouseCategory, 'Все'> // Объект всегда принадлежит конкретной категории
+  category: Exclude<HouseCategory, 'Все'>
   price: string
   priceValue: number
   area: string
@@ -153,7 +153,7 @@ export const ALL_HOUSES: House[] = [
     priceValue: 14500,
     capacity: '4 гостя',
     images: [
-      'https://images.unsplash.com/photo-1493606278519-11aa9f86e905?q=80&w=1200',
+      'https://images.unsplash.com/photo-1518780664697-55e3ad937233?q=80&w=1200',
       'https://images.unsplash.com/photo-1472224371017-08207f84aaae?q=80&w=1200',
     ],
     description:

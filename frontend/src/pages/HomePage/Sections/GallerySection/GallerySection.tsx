@@ -2,13 +2,11 @@ import { useState, useMemo } from 'react'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import { EffectCoverflow, Thumbs, FreeMode, Navigation } from 'swiper/modules'
 import { type Swiper as SwiperType } from 'swiper'
-import { Button, Modal, Tag } from 'antd'
-import { Maximize2, Users, X, ChevronLeft, ChevronRight } from 'lucide-react'
+import { Button, Modal, Tag, Spin } from 'antd'
+import * as Icons from 'lucide-react'
 
-// Твой MotionSection (Shared слой)
 import { MotionSection } from '@shared/ui/Section/MotionSection'
-
-// Константы и типы (из того файла, что мы собрали выше)
+import { useHouses } from '@shared/hooks/useHouses'
 
 import 'swiper/css'
 import 'swiper/css/effect-coverflow'
@@ -16,18 +14,27 @@ import 'swiper/css/thumbs'
 import 'swiper/css/free-mode'
 import 'swiper/css/navigation'
 import styles from './GallerySection.module.scss'
-import { ALL_HOUSES, House } from '../../../../constants'
+import { House } from '@shared/types/types'
 
-/**
- * Вспомогательный компонент для слайдеров внутри модалки.
- * key={house.id} снаружи заставляет React полностью пересоздавать этот компонент,
- * что предотвращает конфликты внутренних состояний Swiper при переключении объектов.
- */
+const LucideIcon = ({ name, size = 18 }: { name: string; size?: number }) => {
+  const isValidIcon = name in Icons
+
+  if (!isValidIcon) {
+    return <Icons.HelpCircle size={size} style={{ opacity: 0.6 }} />
+  }
+
+  const IconComponent = Icons[
+    name as keyof typeof Icons
+  ] as React.ComponentType<{ size?: number }>
+
+  return <IconComponent size={size} />
+}
+
 const ModalGalleryContent = ({ house }: { house: House }) => {
   const [thumbsSwiper, setThumbsSwiper] = useState<SwiperType | null>(null)
 
   return (
-    <div className={styles.galleryBlock}>
+    <div className={styles.modalGalleryBlock}>
       <Swiper
         spaceBetween={10}
         navigation={true}
@@ -35,7 +42,7 @@ const ModalGalleryContent = ({ house }: { house: House }) => {
           swiper: thumbsSwiper && !thumbsSwiper.destroyed ? thumbsSwiper : null,
         }}
         modules={[FreeMode, Navigation, Thumbs]}
-        className={styles.bigImage}
+        className={styles.modalBigImage}
       >
         {house.images.map((img, idx) => (
           <SwiperSlide key={`main-${house.id}-${idx}`}>
@@ -46,17 +53,17 @@ const ModalGalleryContent = ({ house }: { house: House }) => {
 
       <Swiper
         onSwiper={setThumbsSwiper}
-        spaceBetween={10}
+        spaceBetween={8}
         slidesPerView={4}
         freeMode={true}
         watchSlidesProgress={true}
         modules={[FreeMode, Navigation, Thumbs]}
-        className={styles.thumbs}
+        className={styles.modalThumbs}
       >
         {house.images.map((img, idx) => (
           <SwiperSlide
             key={`thumb-${house.id}-${idx}`}
-            className={styles.thumbSlide}
+            className={styles.modalThumbSlide}
           >
             <img src={img} alt="thumbnail" />
           </SwiperSlide>
@@ -70,22 +77,30 @@ export const GallerySection = () => {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [selectedId, setSelectedId] = useState<number | null>(null)
 
-  // Находим индекс текущего объекта в общем массиве
+  const { data, isLoading, isError } = useHouses()
+
+  const allHouses = useMemo<House[]>(() => {
+    if (!data?.catalog) return []
+    return Object.values(data.catalog).flat() as House[]
+  }, [data])
+
   const activeIndex = useMemo(
-    () => ALL_HOUSES.findIndex(obj => obj.id === selectedId),
-    [selectedId],
+    () => allHouses.findIndex(obj => obj.id === selectedId),
+    [selectedId, allHouses],
   )
 
-  const activeObject = ALL_HOUSES[activeIndex]
+  const activeObject = allHouses[activeIndex]
 
   const handleNext = () => {
-    const nextIndex = (activeIndex + 1) % ALL_HOUSES.length
-    setSelectedId(ALL_HOUSES[nextIndex].id)
+    if (allHouses.length === 0) return
+    const nextIndex = (activeIndex + 1) % allHouses.length
+    setSelectedId(allHouses[nextIndex].id)
   }
 
   const handlePrev = () => {
-    const prevIndex = (activeIndex - 1 + ALL_HOUSES.length) % ALL_HOUSES.length
-    setSelectedId(ALL_HOUSES[prevIndex].id)
+    if (allHouses.length === 0) return
+    const prevIndex = (activeIndex - 1 + allHouses.length) % allHouses.length
+    setSelectedId(allHouses[prevIndex].id)
   }
 
   const closeModal = () => {
@@ -100,137 +115,154 @@ export const GallerySection = () => {
           <h2 className={styles.title}>Наши объекты</h2>
         </header>
 
-        {/* Главный Coverflow слайдер на странице */}
-        <Swiper
-          effect={'coverflow'}
-          grabCursor={true}
-          centeredSlides={true}
-          slidesPerView={'auto'}
-          initialSlide={1}
-          coverflowEffect={{
-            rotate: 0,
-            stretch: 0,
-            depth: 100,
-            modifier: 2.5,
-            slideShadows: false,
-          }}
-          modules={[EffectCoverflow]}
-          className={styles.mainSwiper}
-        >
-          {ALL_HOUSES.map(obj => (
-            <SwiperSlide
-              key={obj.id}
-              className={styles.slide}
-              onClick={() => {
-                setSelectedId(obj.id)
-                setIsModalOpen(true)
-              }}
-            >
-              <div className={styles.imageContainer}>
-                <img src={obj.images[0]} alt={obj.title} />
-                <div className={styles.slideOverlay}>
-                  <div className={styles.slideInfo}>
-                    <Tag className={styles.categoryTag}>{obj.category}</Tag>
-                    <h3>{obj.title}</h3>
-                    <p>
-                      {obj.area} • {obj.price}
-                    </p>
+        {isLoading ? (
+          <div className={styles.centerBox}>
+            <Spin size="large" tip="Загрузка объектов..." />
+          </div>
+        ) : isError ? (
+          <div className={styles.centerBox}>
+            <p className={styles.errorText}>
+              Не удалось загрузить данные галереи
+            </p>
+          </div>
+        ) : (
+          <Swiper
+            effect={'coverflow'}
+            grabCursor={true}
+            centeredSlides={true}
+            slidesPerView={'auto'}
+            initialSlide={allHouses.length > 1 ? 1 : 0}
+            coverflowEffect={{
+              rotate: 0,
+              stretch: 0,
+              depth: 100,
+              modifier: 2.5,
+              slideShadows: false,
+            }}
+            modules={[EffectCoverflow]}
+            className={styles.mainSwiper}
+          >
+            {allHouses.map(obj => (
+              <SwiperSlide
+                key={obj.id}
+                className={styles.slide}
+                onClick={() => {
+                  setSelectedId(obj.id)
+                  setIsModalOpen(true)
+                }}
+              >
+                <div className={styles.imageContainer}>
+                  <img src={obj.images[0]} alt={obj.title} loading="lazy" />
+                  <div className={styles.slideOverlay}>
+                    <div className={styles.slideInfo}>
+                      <Tag className={styles.categoryTag}>{obj.category}</Tag>
+                      <h3>{obj.title}</h3>
+                      <p>
+                        {obj.area} • {obj.price}
+                      </p>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </SwiperSlide>
-          ))}
-        </Swiper>
+              </SwiperSlide>
+            ))}
+          </Swiper>
+        )}
 
-        {/* Детальная модалка */}
         <Modal
           open={isModalOpen}
           onCancel={closeModal}
           footer={null}
           width={1100}
           centered
-          destroyOnClose // Важно для сброса стейта Swiper при закрытии
+          destroyOnClose
           className={styles.premiumModal}
           closeIcon={
             <div className={styles.closeBtn}>
-              <X size={20} />
+              <Icons.X size={18} />
             </div>
           }
         >
           {activeObject && (
             <div className={styles.modalLayout}>
-              {/* Навигация между объектами внутри модалки */}
               <div className={styles.modalNav}>
                 <button className={styles.navAction} onClick={handlePrev}>
-                  <ChevronLeft size={20} />
+                  <Icons.ChevronLeft size={18} />
                   <span>Назад</span>
                 </button>
                 <div className={styles.navCounter}>
-                  {activeIndex + 1} / {ALL_HOUSES.length}
+                  {activeIndex + 1} / {allHouses.length}
                 </div>
                 <button className={styles.navAction} onClick={handleNext}>
                   <span>Вперед</span>
-                  <ChevronRight size={20} />
+                  <Icons.ChevronRight size={18} />
                 </button>
               </div>
 
-              <div className={styles.topSection}>
-                {/* Контент галереи с ключом для ререндера */}
-                <ModalGalleryContent
-                  key={activeObject.id}
-                  house={activeObject}
-                />
+              <div className={styles.modalScrollableArea}>
+                <div className={styles.topSection}>
+                  <ModalGalleryContent
+                    key={activeObject.id}
+                    house={activeObject}
+                  />
 
-                <div className={styles.shortInfo}>
-                  <div className={styles.headerInfo}>
-                    <Tag color="#000" className={styles.topTag}>
-                      {activeObject.category}
-                    </Tag>
-                    <h1>{activeObject.title}</h1>
-                  </div>
-
-                  <div className={styles.quickStats}>
-                    <div className={styles.stat}>
-                      <Maximize2 size={18} />
-                      <span>{activeObject.area}</span>
-                    </div>
-                    <div className={styles.stat}>
-                      <Users size={18} />
-                      <span>{activeObject.capacity}</span>
-                    </div>
-                  </div>
-
-                  <div className={styles.amenities}>
-                    {activeObject.features.map((f, i) => (
-                      <div key={i} className={styles.amenityItem}>
-                        {f.icon}
-                        <span>{f.label}</span>
+                  <div className={styles.shortInfo}>
+                    <div className={styles.mainScrollContent}>
+                      <div className={styles.headerInfo}>
+                        <Tag color="#000" className={styles.topTag}>
+                          {activeObject.category}
+                        </Tag>
+                        <h1>{activeObject.title}</h1>
                       </div>
-                    ))}
-                  </div>
 
-                  <div className={styles.bookingCard}>
-                    <div className={styles.priceContainer}>
-                      <span className={styles.label}>Стоимость суток</span>
-                      <span className={styles.priceValue}>
-                        {activeObject.price}
-                      </span>
+                      <div className={styles.quickStats}>
+                        <div className={styles.stat}>
+                          <Icons.Maximize2 size={16} />
+                          <span>{activeObject.area}</span>
+                        </div>
+                        {activeObject.capacity && (
+                          <div className={styles.stat}>
+                            <Icons.Users size={16} />
+                            <span>{activeObject.capacity}</span>
+                          </div>
+                        )}
+                      </div>
+
+                      {activeObject.features &&
+                        activeObject.features.length > 0 && (
+                          <div className={styles.amenities}>
+                            {activeObject.features.map((f, i) => (
+                              <div key={i} className={styles.amenityItem}>
+                                <LucideIcon name={f.icon} size={16} />
+                                <span>{f.label}</span>
+                              </div>
+                            ))}
+                          </div>
+                        )}
                     </div>
-                    <Button
-                      type="primary"
-                      block
-                      size="large"
-                      className={styles.mainActionBtn}
-                    >
-                      Забронировать отдых
-                    </Button>
+
+                    <div className={styles.bookingCard}>
+                      <div className={styles.priceContainer}>
+                        <span className={styles.label}>Стоимость</span>
+                        <span className={styles.priceValue}>
+                          {activeObject.price}
+                        </span>
+                      </div>
+                      <Button
+                        type="primary"
+                        block
+                        size="large"
+                        className={styles.mainActionBtn}
+                      >
+                        Забронировать отдых
+                      </Button>
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              <div className={styles.bottomSection}>
-                <h3>Об объекте</h3>
-                <p>{activeObject.description}</p>
+                <div className={styles.bottomSection}>
+                  <h3>Об объекте</h3>
+                  <p>{activeObject.description}</p>
+                </div>
               </div>
             </div>
           )}

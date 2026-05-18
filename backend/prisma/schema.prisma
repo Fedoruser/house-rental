@@ -1,13 +1,69 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Get a free hosted Postgres database in seconds: `npx create-db`
-
-generator client {
-  provider = "prisma-client"
-  output   = "../generated/prisma"
+datasource db {
+  provider = "postgresql" // или mysql / sqlite, смотря что выберешь
 }
 
-datasource db {
-  provider = "postgresql"
+generator client {
+  provider = "prisma-client-js"
+}
+
+model House {
+  id          Int      @id @default(autoincrement())
+  title       String   @db.VarChar(255)
+  category    String   @db.VarChar(100) // Например: "Скандинавский", "Европейский"
+  area        String   @db.VarChar(50)  // Например: "120 м²"
+  price       String   @db.VarChar(50)  // Например: "от 5.4 млн ₽" (или Float, если нужен точный расчет)
+  capacity    String?  @db.VarChar(50)  // Например: "4-6 человек" (используется в твоей галерее)
+  description String   @db.Text
+  images      String[] // Массив URL картинок (PostgreSQL поддерживает из коробки)
+  
+  // Связь с фичами/удобствами дома
+  features    Feature[]
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([category]) // Индекс для быстрой фильтрации по табам в каталоге
+}
+
+
+model Review {
+  id         Int      @id @default(autoincrement())
+  name       String   @db.VarChar(255)
+  avatar     String   @db.Text         // URL аватарки
+  houseType  String   @db.VarChar(150) // Например: "Построен дом «Осло 120»"
+  text       String   @db.Text
+  rating     Int      @default(5)
+  isApproved Boolean  @default(true)
+  
+  createdAt  DateTime @default(now())
+}
+
+// 2. Дополнительные фичи дома (amenities из твоей модалки)
+model Feature {
+  id       Int    @id @default(autoincrement())
+  icon     String @db.VarChar(50)  // Название иконки (например, "Users", "Maximize2")
+  label    String @db.VarChar(150) // Текст фичи (например, "Баня на дровах")
+  houseId  Int
+  house    House  @relation(fields: [houseId], references: [id], onDelete: Cascade)
+
+  @@index([houseId])
+}
+
+// 3. Заявки из форм (Форма на Hero и форма в Contacts)
+model Lead {
+  id        Int      @id @default(autoincrement())
+  name      String   @db.VarChar(255)
+  phone     String   @db.VarChar(30)
+  message   String?  @db.Text         // Необязательное поле (из секции контактов)
+  source    String   @db.VarChar(50)  // Источник: "hero_form" или "contacts_form"
+  status    LeadStatus @default(NEW)  // Статус заявки для админки NestJS
+  
+  createdAt DateTime @default(now())
+}
+
+enum LeadStatus {
+  NEW
+  IN_PROGRESS
+  COMPLETED
+  REJECTED
 }
