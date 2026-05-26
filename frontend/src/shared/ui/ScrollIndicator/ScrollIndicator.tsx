@@ -16,7 +16,7 @@ export const ScrollIndicator = () => {
   useEffect(() => {
     const observerOptions = {
       root: null,
-      rootMargin: '-50% 0px', // Считаем секцию активной, когда она на середине экрана
+      rootMargin: '-50% 0px',
       threshold: 0,
     }
 
@@ -30,7 +30,6 @@ export const ScrollIndicator = () => {
 
     const observer = new IntersectionObserver(observerCallback, observerOptions)
 
-    // Подписываемся на все секции
     sections.forEach(section => {
       const el = document.getElementById(section.id)
       if (el) observer.observe(el)
@@ -54,12 +53,10 @@ export const ScrollIndicator = () => {
           className={styles.dotContainer}
           onClick={() => scrollToSection(section.id)}
         >
-          {/* Подсказка при наведении (Apple Style) */}
           <AnimatePresence>
             <motion.span className={styles.label}>{section.label}</motion.span>
           </AnimatePresence>
 
-          {/* Сама точка */}
           <motion.div
             className={styles.dot}
             animate={{

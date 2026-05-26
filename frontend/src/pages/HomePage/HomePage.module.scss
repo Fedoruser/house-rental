@@ -1,11 +1,9 @@
 .page {
   height: 100vh;
   overflow-y: auto;
-  // Включаем обязательную привязку к секциям
   scroll-snap-type: y mandatory;
   scroll-behavior: smooth;
 
-  /* Скрываем дефолтный скроллбар для чистоты дизайна */
   &::-webkit-scrollbar {
     display: none;
   }
@@ -13,7 +11,6 @@
   -ms-overflow-style: none;
 }
 
-/* универсальный layout для всех секций */
 .section {
   height: 100vh;
 

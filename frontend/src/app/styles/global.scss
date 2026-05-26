@@ -3,11 +3,11 @@ body {
   height: 100%;
   margin: 0;
   padding: 0;
-  overflow: hidden; // Важно: убираем скролл у body
+  overflow: hidden;
 }
 
 #root {
-  height: 100%; // Обязательно фиксируем высоту
+  height: 100%;
 }
 
 .container {
@@ -32,5 +32,3 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
-
-/* контейнер */

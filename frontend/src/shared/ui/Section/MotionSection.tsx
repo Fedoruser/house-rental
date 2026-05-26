@@ -8,10 +8,8 @@ interface MotionSectionProps {
   id: string
   className?: string
 
-  /* fullscreen hero style */
   fullscreen?: boolean
 
-  /* aggressive snap */
   snap?: boolean
 }
 
